@@ -86,7 +86,7 @@ object SetDSL:
       }
   @main def runDSL : Unit =
     import SetOp1.*
-    var expression = Assign(SetName("someSetName"), Insert(Variable("var"), Value(2), Value("somestring"))).eval
+    var expression = Assign(SetName("someSetName"), Variable("x")).eval
     expression = Check("someSetName",Value(1)).eval
     println(SetBinding)
     //    expression = Scope("scopename", Assign(SetName("someSetName"), Insert(Variable("var"), Value(1), Value("somestring")))).eval
