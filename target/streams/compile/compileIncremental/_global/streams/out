@@ -1,0 +1,33 @@
+[debug] [zinc] IncrementalCompile -----------
+[debug] IncrementalCompile.incrementalCompile
+[debug] previous = Stamps for: 31 products, 1 sources, 2 libraries
+[debug] current source = Set(${BASE}/src/main/scala/SetDSL.scala)
+[debug] > initialChanges = InitialChanges(Changes(added = Set(), removed = Set(), changed = Set(${BASE}/src/main/scala/SetDSL.scala), unmodified = ...),Set(${BASE}/target/scala-3.1.0/classes/SetDSL$SetOp1.class, ${BASE}/target/scala-3.1.0/classes/SetDSL.class, ${BASE}/target/scala-3.1.0/classes/runDSL.class),Set(),API Changes: Set())
+[debug] 
+[debug] Initial source changes:
+[debug] 	removed: Set()
+[debug] 	added: Set()
+[debug] 	modified: Set(${BASE}/src/main/scala/SetDSL.scala)
+[debug] Invalidated products: Set(${BASE}/target/scala-3.1.0/classes/SetDSL$SetOp1.class, ${BASE}/target/scala-3.1.0/classes/SetDSL.class, ${BASE}/target/scala-3.1.0/classes/runDSL.class)
+[debug] External API changes: API Changes: Set()
+[debug] Modified binary dependencies: Set()
+[debug] Initial directly invalidated classes: Set(SetDSL$.SetOp1$.Value, SetDSL$.SetOp1$.Union, SetDSL$.SetOp1$.Check, SetDSL$.SetOp1$.Insert, SetDSL$.SetOp1$.Intersection, SetDSL$.SetOp1$.Scope, runDSL, SetDSL$.SetOp1$.Macro, SetDSL$.SetOp1$.Variable, SetDSL$.SetOp1$.Assign, SetDSL$.SetOp1$.SetDifference, SetDSL$.SetOp1$.CartesianProduct, SetDSL$.SetOp1$.SymmetricDifference, SetDSL, SetDSL$.SetOp1, SetDSL$.SetOp1$.SetName)
+[debug] Sources indirectly invalidated by:
+[debug] 	product: Set(${BASE}/src/main/scala/SetDSL.scala)
+[debug] 	binary dep: Set()
+[debug] 	external source: Set()
+[debug] all 1 sources are invalidated
+[debug] Initial set of included nodes: SetDSL$.SetOp1$.Value, SetDSL$.SetOp1$.Union, SetDSL$.SetOp1$.Check, SetDSL$.SetOp1$.Insert, SetDSL$.SetOp1$.Intersection, SetDSL$.SetOp1$.Scope, runDSL, SetDSL$.SetOp1$.Macro, SetDSL$.SetOp1$.Variable, SetDSL$.SetOp1$.Assign, SetDSL$.SetOp1$.SetDifference, SetDSL$.SetOp1$.CartesianProduct, SetDSL$.SetOp1$.SymmetricDifference, SetDSL, SetDSL$.SetOp1, SetDSL$.SetOp1$.SetName
+[debug] Including SetDSL$.SetOp1$.SetName by SetDSL$.SetOp1
+[debug] Recompiling all sources: number of invalidated sources > 50.0% of all sources
+[debug] compilation cycle 1
+[info] compiling 1 Scala source to C:\Users\abhij\OneDrive\Desktop\untitled\target\scala-3.1.0\classes ...
+[debug] Returning already retrieved and compiled bridge: C:\Users\abhij\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-sbt-bridge\3.1.0\scala3-sbt-bridge-3.1.0.jar.
+[debug] [zinc] Running cached compiler 711bef08 for Scala Compiler version 3.1.0
+[debug] [zinc] The Scala compiler is invoked with:
+[debug] 	-bootclasspath
+[debug] 	C:\Users\abhij\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala3-library_3\3.1.0\scala3-library_3-3.1.0.jar;C:\Users\abhij\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scala-lang\scala-library\2.13.6\scala-library-2.13.6.jar
+[debug] 	-classpath
+[debug] 	C:\Users\abhij\OneDrive\Desktop\untitled\target\scala-3.1.0\classes;C:\Users\abhij\AppData\Local\Coursier\Cache\v1\https\repo1.maven.org\maven2\org\scalactic\scalactic_3\3.2.11\scalactic_3-3.2.11.jar
+[debug] Scala compilation took 0.791758 s
+[info] done compiling

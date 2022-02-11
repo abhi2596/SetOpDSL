@@ -1,0 +1,10 @@
+[debug] Acquiring lock on file C:\Users\abhij\OneDrive\Desktop\untitled\project\target\.sbt-compilation-infos\root-compile\.sbt-idea-lock ...
+[warn] -- [E029] Pattern Match Exhaustivity Warning: C:\Users\abhij\OneDrive\Desktop\untitled\src\main\scala\SetDSL.scala:24:6 
+[warn] 24 |      this match{
+[warn]    |      ^^^^
+[warn]    |match may not be exhaustive.
+[warn]    |
+[warn]    |It would fail on pattern case: SetOp1.CartesianProduct(_, _), SetOp1.Macro(_, _)
+[warn] one warning found
+[warn] one warning found
+[debug] Releasing lock on file C:\Users\abhij\OneDrive\Desktop\untitled\project\target\.sbt-compilation-infos\root-compile\.sbt-idea-lock.
