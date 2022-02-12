@@ -20,7 +20,7 @@ takes two arguments either Value or Variable and it creates a Set with these two
 
 ## Insert() 
 takes two arguments one is SetName and the other is Create Create should contain the values which needs to be inserted in the SetName specified and SetName should contain the SetName in which the values are inserted. For Insert to work the SetName should be present the system if not present it may throw error
-### Example: Insert(SetName("someSetName"),Create(Value(1),Variable("string")))
+### Example: Insert(SetName("someSetName"),Create(Value(1),Variable("string")))  
 
 ## Assign() 
 takes two arguments like Insert() the only difference between Insert and Assign is Assign checks if the SetName is present or not if not present it creates a new one 
@@ -34,6 +34,19 @@ takes two arguments one is SetName() and the other is Value or Variable it check
 ## Delete() 
 takes two arguments one is SetName() and the other is Value or Variable it deletes the Value or Variable specified from the SetName it does not return anything
 ### Example: Delete(SetName("someSetName"),Value(1)), Delete(SetName("someSetName"),Value(1))
+
+## Union(), Intersection(), SetDifference(), SymmetricDifference(), CartesianProduct()
+takes two arguments both are SetName() which contain the setnames for which we want to calculate the union 
+### Example: Union(SetName("someSetName"),SetName("SetName"))
+
+## bindingMacro() 
+it takes two arguments one is the name which we want to assign to this Macro and the other is the SetDSL operation from the above displayed so this binds Macro to the SetOperation
+### Example: bindingMacro("name",Union(SetName("someSetName"),SetName("SetName")))
+
+## Macro()
+the above operation assigns a SetDSL operation to a macro and to refer to it we can access it using the string used above
+### Example: Macro("name") this replaces the operation Macro("name") with whatever operation was specified using bindingMacro so if bindingMacro("name",Union(SetName("someSetName"),SetName("SetName"))) was the command used for binding then in the program if we call Macro("name") it will be replaced by Union(SetName("someSetName"),SetName("SetName"))
+
 
 
 
