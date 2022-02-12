@@ -2,10 +2,10 @@
 
 Created a Domain Specific Language for Set Operations using Scala
 
-# Value()
+## Value()
 takes a single argument and the single argument passed can be a number or a string Example: Value(1), Value("string"), Value(3.0)
 
-# Variable() 
+## Variable() 
 takes a single argument and the single argument should be variable name which exists in the Language if not present it assigns a value of 0
 
 # SetName() 
