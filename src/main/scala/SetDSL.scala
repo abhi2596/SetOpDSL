@@ -1,23 +1,27 @@
 object SetDSL:
   private val binding : collection.mutable.Map[String,Any]= collection.mutable.Map("var"-> 1)
   private val SetBinding : collection.mutable.Map[String,Set[Any]]= collection.mutable.Map("someSetName" -> Set(3))
-  private val MacroBinding : collection.mutable.Map[String,String]= collection.mutable.Map()
+  private val MacroBinding : collection.mutable.Map[String,SetOp1]= collection.mutable.Map[String,SetOp1]()
   private val ScopeBinding : collection.mutable.Map[String,collection.mutable.Map[String,Set[Any]]] = collection.mutable.Map()
   enum SetOp1:
     case Variable(Name:String)
     case Value(Val:Any)
     case SetName(Name: String)
     case Check(op1:SetOp1,op2:SetOp1)
-    case Insert(op: SetOp1, arg: SetOp1 , arg1:SetOp1) // used when setname is present in the set
-    case Assign(x:SetOp1,y:SetOp1,z:SetOp1) // used when setname is not present in the set binding
+    case Create(x:SetOp1,y:SetOp1)
+    case Insert(op: SetOp1, op1:SetOp1) // used when setname is present in the set
+    case Assign(x:SetOp1,y:SetOp1) // used when setname is not present in the set binding
     case Delete(x:SetOp1,y:SetOp1)
     case Union(x:SetOp1 , y: SetOp1)
     case Intersection(x:SetOp1,y:SetOp1)
     case SetDifference(x:SetOp1,y:SetOp1)
     case CartesianProduct(x:SetOp1,y:SetOp1)
     case SymmetricDifference(x:SetOp1,y:SetOp1)
-    case Macro(x:String,y:String)
     case Scope(x:String,y:SetOp1,z:SetOp1,a:SetOp1)
+    case NestedScope(x:String,y:SetOp1,z:SetOp1,a:SetOp1,b:SetOp1)
+    case bindingMacro(x:String,y:SetOp1)
+    case Macro(x:String)
+
 
     def eval: Any=
       this match{
@@ -34,24 +38,28 @@ object SetDSL:
             true
           else
             false
-        case Assign(op1,op2,op3) =>
+        case Assign(op1,op2) =>
           val setName = op1.eval.asInstanceOf[String]
-          val insert = Set(op2.eval,op3.eval)
+          val insert = op2.eval
           if (SetBinding.contains(setName)) {
-              val set = SetBinding(setName) ++ insert
-              SetBinding += (setName -> set)
-            }
+            val set = SetBinding(setName).union(insert.asInstanceOf[Set[Any]])
+            SetBinding += (setName -> set)
+          }
           else {
-              SetBinding += (setName -> insert)
-            }
+            SetBinding += (setName -> Set())
+            val set = SetBinding(setName).union(insert.asInstanceOf[Set[Any]])
+            SetBinding+= (setName -> set)
+          }
           SetBinding(setName)
 
+        case Create(x,y) =>
+          Set(x.eval,y.eval)
 
-        case Insert(op1,op2,op3) =>
+        case Insert(op1,op2) =>
           val setname = op1.eval.asInstanceOf[String]
-          val insert = Set(op2.eval,op3.eval) ++ SetBinding(setname)
-          SetBinding += (setname -> insert)
-          SetBinding(setname)
+          val insert = op2.eval
+          val set = SetBinding(setname).union(insert.asInstanceOf[Set[Any]])
+          SetBinding += (setname -> set)
 
         case Delete(op1,op2) =>
           val name = op1.eval
@@ -73,56 +81,34 @@ object SetDSL:
           val SetCp = collection.mutable.Set[Any]()
           for (i<-Set1) {
             for (j<-Set2){
-              SetCp += Set(i,j)
+              SetCp += ((i,j))
             }
           }
           SetCp
-
-        case Scope(x,y,z,a) =>
-          val setname = y.eval.asInstanceOf[String]
-          SetBinding += (setname-> Set(z.eval,a.eval))
-          if (ScopeBinding.contains(x)){
-            ScopeBinding(x)(setname) = ScopeBinding(x)(setname) ++ SetBinding(setname)
-            Delete(SetName(setname),z).eval
-            Delete(SetName(setname),y).eval
-            ScopeBinding
-          }
-          else {
-            ScopeBinding += (x -> collection.mutable.Map(setname -> SetBinding(setname)))
-            Delete(SetName(setname),z).eval
-            Delete(SetName(setname),y).eval
-            ScopeBinding
-          }
+        case bindingMacro(x,y) =>
+          MacroBinding += (x-> y)
+        case Macro(x) =>
+          MacroBinding(x).eval
       }
   @main def runDSL : Unit =
     import SetOp1.*
-//    var expression = Insert(SetName("someSetName"),Value(1),Variable("x")).eval
+//    var expression = bindingMacro("name",Create(Variable("string"),Value(1))).eval
+//    expression = Assign(SetName("somesetname"),Macro("name")).eval
 //    println(expression)
-//    expression = Assign(SetName("someSetName1"),Value(2),Variable("var")).eval
-//    expression = Assign(SetName("someSetName2"),Union(SetName("someSetName"),SetName("someSetName1"))).eval
-//    expression = Union(SetName("someSetName1"),SetName("someSetName")).eval
-//    println(expression)
-//    expression = Assign(SetName("someSetName1"),Variable("var"),Value("string")).eval
-//    println(expression)
-//    println(Check(SetName("someSetName1"), Value("string")).eval)
-//    var expression = Assign(SetName("someSetName"),Value(1),Value("somestring")).eval
-//    println(expression)
-//    println(SetBinding)
-//    expression = Insert(SetName("someSetName"),Variable("var"),Value(3)).eval
-//    expression = Union(SetName("someSetName1"),SetName("someSetName")).eval
-//    expression = Delete(SetName("someSetName"),Value(1)).eval
-//    var expression = Scope("name",SetName("someSetName"),Value(1),Value("somestring")).eval
-//    println(expression)
-//    expression = Scope("name",SetName("someSetName"),Value(2),Value("string")).eval
-//    expression = Scope("othername",SetName("someSetName"),Value(2),Value("string")).eval
-//    Scope("scopename", Scope("othername", Assign(Variable("someSetName"),Variable("var"), Value(1)), Value("somestring"))))
-//    println(expression)
-//    print(ScopeBinding)
-    var expression=Assign(SetName("SetName"),Value(2),Value(6)).eval
-    expression=Insert(SetName("SetName"),Value(7),Value(9)).eval
-    expression=Assign(SetName("SetName1"),Value(2),Value(4)).eval
-    expression = Insert(SetName("SetName1"),Value(6),Value(10)).eval
-    expression = SymmetricDifference(SetName("SetName"),SetName("SetName1")).eval
-    print(expression)
+//    expression = Assign
+//    expression = bindingMacro("name",Variable("var")).eval
+//    expression = Delete(SetName("somesetname"),Macro("name")).eval
+//    print(expression)
+//    Assign(SetName("SomeSetName"),Create(Value(2),Value(6))).eval
+//    Assign(SetName("SomeSetName1"),Create(Value(2),Value(4))).eval
+//    bindingMacro("UnionSetOp",Union(SetName("SomeSetName"),SetName("SomeSetName1"))).eval
+//    val macrounion = Assign(SetName("SomeSetName3"),Macro("UnionSetOp")).eval
+//    println(macrounion)
+    Assign(SetName("someSetName"),Create(Value(1),Value(3))).eval
+    Insert(SetName("someSetName"),Create(Value("string"),Value(5))).eval
+    Assign(SetName("someSetName1"),Create(Value(2),Value("string"))).eval
+    Insert(SetName("someSetName1"),Create(Value(1),Value("somestring"))).eval
+    val setDiff = SetDifference(SetName("someSetName"),SetName("someSetName1")).eval
+    println(setDiff)
 
 

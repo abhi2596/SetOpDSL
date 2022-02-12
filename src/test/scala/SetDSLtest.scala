@@ -8,40 +8,64 @@ class YourSetTheoryLanguageTest extends AnyFlatSpec with Matchers {
   behavior of "my first language for set theory operations"
 
   it should "create a set and insert objects into it" in {
-    Insert(SetName("someSetName"),Value(1),Value("somestring")).eval
-    Assign(SetName("someSetName1"),Variable("var"),Value("string")).eval
+    Insert(SetName("someSetName"),Create(Value(1),Value("somestring"))).eval
+    Assign(SetName("someSetName1"),Create(Variable("var"),Value("string"))).eval
     Check(SetName("someSetName"), Value(1)).eval shouldBe true
     Check(SetName("someSetName1"), Value("string")).eval shouldBe true
   }
 
   it should "Delete elements in a Set" in {
-    Insert(SetName("someSetName"),Value(1),Value("somestring")).eval
+    Insert(SetName("someSetName"),Create(Value(1),Value("somestring"))).eval
     Delete(SetName("someSetName"),Value("somestring")).eval
     Check(SetName("someSetName"), Value("somestring")).eval shouldBe false
+    Assign(SetName("someSetName1"),Create(Value(3.0),Value("somestring"))).eval
+    Delete(SetName("someSetName"),Value(3.0)).eval
+    Check(SetName("someSetName"), Value(3.0)).eval shouldBe false
   }
-
+//
   it should "test different set operations" in {
-    Assign(SetName("someSetName"),Value(1),Value(3)).eval
-    Insert(SetName("someSetName"),Value("string"),Value(5)).eval
-    Assign(SetName("someSetName1"),Value(2),Value("string")).eval
-    Insert(SetName("someSetName1"),Value(1),Value("somestring")).eval
+    Assign(SetName("someSetName"),Create(Value(1),Value(3))).eval
+    Insert(SetName("someSetName"),Create(Value("string"),Value(5))).eval
+    Assign(SetName("someSetName1"),Create(Value(2),Value("string"))).eval
+    Insert(SetName("someSetName1"),Create(Value(1),Value("somestring"))).eval
     val union = Union(SetName("someSetName"),SetName("someSetName1")).eval
     union.asInstanceOf[Set[Any]] should contain allOf (1,2,3,"string","somestring",5)
     val setDiff = SetDifference(SetName("someSetName"),SetName("someSetName1")).eval
     setDiff.asInstanceOf[Set[Any]] should contain allOf (3,5)
     val intersection = Intersection(SetName("someSetName"),SetName("someSetName1")).eval
     intersection.asInstanceOf[Set[Any]] should contain allOf (1,"string")
-//    symmetricDifference.asInstanceOf[Set[Any]] should contain allOf ()
-    Assign(SetName("SetName"),Value(2),Value(6)).eval
-    Insert(SetName("SetName"),Value(7),Value(9)).eval
-    Assign(SetName("SetName1"),Value(2),Value(4)).eval
-    Insert(SetName("SetName1"),Value(6),Value(10)).eval
+  }
+////
+  it should "test Set Operations Symmeteric Difference and Cartesian Product" in {
+    Assign(SetName("SetName"),Create(Value(2),Value(6))).eval
+    Insert(SetName("SetName"),Create(Value(7),Value(9))).eval
+    Assign(SetName("SetName1"),Create(Value(2),Value(4))).eval
+    Insert(SetName("SetName1"),Create(Value(6),Value(10))).eval
     val symmetricDifference = SymmetricDifference(SetName("SetName"),SetName("SetName1")).eval
     symmetricDifference.asInstanceOf[Set[Any]] should contain allOf (4,7,9,10)
-//    val cartesianProduct = CartesianProduct(SetName("setName"),SetName("setName1")).eval
-//    cartesianProduct should contain allOf mutable.HashSet(Set(1,3),Set(1,4),Set(2,3),Set(2,4))
+    Assign(SetName("SomeSetName"),Create(Value(2),Value(6))).eval
+    Assign(SetName("SomeSetName1"),Create(Value(2),Value(4))).eval
+    val cartesianProduct = CartesianProduct(SetName("SomeSetName"),SetName("SomeSetName1")).eval
+    cartesianProduct shouldEqual  mutable.HashSet((2, 2), (6, 4), (6, 2), (2, 4))
   }
-
-
-
+////
+//  it should "Named Scope and Nested Scope" in {
+//    val nestedScope = NestedScope("somename",Scope("name",SetName("somesetname"),Variable("x"),Value(1)),SetName("somesetname"),Value(1),Value("somestring")).eval
+//    nestedScope shouldEqual Map("somename" -> Map("somesetname" -> Set(1, "somestring")), "name" -> Map("somesetname" -> Set(0, 1)))
+//    Scope("name1",SetName("someSetName"),Value(1),Value("somestring")).eval shouldEqual Map("someSetName" -> Set(1, "somestring"))
+//    Scope("name1",SetName("someSetName"),Value(4),Value("string")).eval shouldEqual Map("someSetName" -> Set(1, "somestring",4,"string"))
+//  }
+  it should "Macros are tested" in {
+    bindingMacro("name",Create(Variable("string"),Value(1))).eval
+    Assign(SetName("someSetName"),Macro("name")).eval
+    Check(SetName("someSetName"), Value(1)).eval shouldBe true
+    bindingMacro("name1",Value(1)).eval
+    Delete(SetName("someSetName"),Macro("name1")).eval
+    Check(SetName("someSetName"), Value(1)).eval shouldBe false
+    Assign(SetName("SomeSetName"),Create(Value(2),Value(6))).eval
+    Assign(SetName("SomeSetName1"),Create(Value(2),Value(4))).eval
+    bindingMacro("UnionSetOp",Union(SetName("SomeSetName"),SetName("SomeSetName1"))).eval
+    val macrounion = Assign(SetName("SomeSetName3"),Macro("UnionSetOp")).eval
+    macrounion.asInstanceOf[Set[Any]] should contain allOf (2,6,4)
+  }
 }
