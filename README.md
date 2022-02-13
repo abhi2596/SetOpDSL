@@ -1,3 +1,7 @@
+# To run this DSL
+Download the files from this repository and open it using IntelliJ Idea or one other IDEA the source file contains a main folder which has the code and to test there is a test folder which contains the test cases on which these code is tested
+
+
 # SetOpDSL
 
 Created a Domain Specific Language for Set Operations using Scala
