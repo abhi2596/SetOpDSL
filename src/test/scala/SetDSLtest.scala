@@ -24,14 +24,14 @@ class YourSetTheoryLanguageTest extends AnyFlatSpec with Matchers {
   }
 //
   it should "test different set operations" in {
-    Assign(SetName("someSetName"),Create(Value(1),Value(3))).eval
+    Assign(SetName("someSetName"),Create(Value(1),Value(4))).eval
     Insert(SetName("someSetName"),Create(Value("string"),Value(5))).eval
     Assign(SetName("someSetName1"),Create(Value(2),Value("string"))).eval
     Insert(SetName("someSetName1"),Create(Value(1),Value("somestring"))).eval
     val union = Union(SetName("someSetName"),SetName("someSetName1")).eval
     union.asInstanceOf[Set[Any]] should contain allOf (1,2,3,"string","somestring",5)
     val setDiff = SetDifference(SetName("someSetName"),SetName("someSetName1")).eval
-    setDiff.asInstanceOf[Set[Any]] should contain allOf (3,5)
+    setDiff.asInstanceOf[Set[Any]] should contain allOf (4,5)
     val intersection = Intersection(SetName("someSetName"),SetName("someSetName1")).eval
     intersection.asInstanceOf[Set[Any]] should contain allOf (1,"string")
   }
@@ -48,13 +48,7 @@ class YourSetTheoryLanguageTest extends AnyFlatSpec with Matchers {
     val cartesianProduct = CartesianProduct(SetName("SomeSetName"),SetName("SomeSetName1")).eval
     cartesianProduct shouldEqual  mutable.HashSet((2, 2), (6, 4), (6, 2), (2, 4))
   }
-////
-//  it should "Named Scope and Nested Scope" in {
-//    val nestedScope = NestedScope("somename",Scope("name",SetName("somesetname"),Variable("x"),Value(1)),SetName("somesetname"),Value(1),Value("somestring")).eval
-//    nestedScope shouldEqual Map("somename" -> Map("somesetname" -> Set(1, "somestring")), "name" -> Map("somesetname" -> Set(0, 1)))
-//    Scope("name1",SetName("someSetName"),Value(1),Value("somestring")).eval shouldEqual Map("someSetName" -> Set(1, "somestring"))
-//    Scope("name1",SetName("someSetName"),Value(4),Value("string")).eval shouldEqual Map("someSetName" -> Set(1, "somestring",4,"string"))
-//  }
+
   it should "Macros are tested" in {
     bindingMacro("name",Create(Variable("string"),Value(1))).eval
     Assign(SetName("someSetName"),Macro("name")).eval
@@ -68,4 +62,5 @@ class YourSetTheoryLanguageTest extends AnyFlatSpec with Matchers {
     val macrounion = Assign(SetName("SomeSetName3"),Macro("UnionSetOp")).eval
     macrounion.asInstanceOf[Set[Any]] should contain allOf (2,6,4)
   }
+  
 }
