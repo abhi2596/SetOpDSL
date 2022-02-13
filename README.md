@@ -49,7 +49,7 @@ it takes two arguments one is the name which we want to assign to this Macro and
 
 ## Macro()
 the above operation assigns a SetDSL operation to a macro and to refer to it we can access it using the string used above 
-##### Example: Macro("name") this replaces the operation Macro("name") with whatever operation was specified using bindingMacro so if bindingMacro("name",Union(SetName("someSetName"),SetName("SetName"))) was the command used for binding then in the program if we call Macro("name") it will be replaced by Union(SetName("someSetName"),SetName("SetName"))
+Example: Macro("name") this replaces the operation Macro("name") with whatever operation was specified using bindingMacro so if bindingMacro("name",Union(SetName("someSetName"),SetName("SetName"))) was the command used for binding then in the program if we call Macro("name") it will be replaced by Union(SetName("someSetName"),SetName("SetName"))
 
 ## Scope()
 the above operation can be used if the user wants to implement scoping in their SetDSL it works like these
