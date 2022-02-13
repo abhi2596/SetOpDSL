@@ -18,6 +18,10 @@ takes a single argument and the single argument should be a name of the set it s
 takes two arguments either Value or Variable and it creates a Set with these two values 
 #### Example: Create(Value(1),Variable("string")) 
 
+## ValSet()
+this can used if we want to pass multiple arguments to the Assign operation
+#### Example: ValSet(1,2,3,4)
+
 ## Insert() 
 takes two arguments one is SetName and the other is Create Create should contain the values which needs to be inserted in the SetName specified and SetName should contain the SetName in which the values are inserted. For Insert to work the SetName should be present the system if not present it may throw error
 #### Example: Insert(SetName("someSetName"),Create(Value(1),Variable("string")))  
@@ -44,8 +48,12 @@ it takes two arguments one is the name which we want to assign to this Macro and
 #### Example: bindingMacro("name",Union(SetName("someSetName"),SetName("SetName")))
 
 ## Macro()
-the above operation assigns a SetDSL operation to a macro and to refer to it we can access it using the string used above
-#### Example: Macro("name") this replaces the operation Macro("name") with whatever operation was specified using bindingMacro so if bindingMacro("name",Union(SetName("someSetName"),SetName("SetName"))) was the command used for binding then in the program if we call Macro("name") it will be replaced by Union(SetName("someSetName"),SetName("SetName"))
+the above operation assigns a SetDSL operation to a macro and to refer to it we can access it using the string used above 
+##### Example: Macro("name") this replaces the operation Macro("name") with whatever operation was specified using bindingMacro so if bindingMacro("name",Union(SetName("someSetName"),SetName("SetName"))) was the command used for binding then in the program if we call Macro("name") it will be replaced by Union(SetName("someSetName"),SetName("SetName"))
+
+## Scope()
+the above operation can be used if the user wants to implement scoping in their SetDSL it works like these
+Example: Scope("name",Scope("name1",Assign(SetName("SetName"),ValSet(1,2)),Value(1)),Assign(SetName("SetName"),ValSet(3,4)) the SetName in name1 contains 1,2 whereas the SetName in name scope contains 3,4 this is how a user can implement Scoping
 
 
 
