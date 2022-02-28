@@ -17,5 +17,5 @@ We can clone the project using git clone for this git should be installed in the
   - Now run command sbt test to run the tests. 
   - This command will run all the tests in tests folder.
 
-## [SetOperations instructions](SetOpDSL.md - HW1 Documentation)
-## [ClassOperations instructions](ClassOperation.md - HW2 Documentation)
+## [SetOperations instructions - HW1 Documentation](SetOpDSL.md)
+## [ClassOperations instructions - HW2 Documentation](ClassOperation.md)
