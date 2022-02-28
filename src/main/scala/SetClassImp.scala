@@ -12,7 +12,7 @@ object SetClass:
   // this Map is similar to ConstructorMapping but this one is used for NestedClass Implementation
   // this Map has outerClassname which maps to InnerClassName which further maps to MethodName and its Sequence Of operations
   private val NestedConstructorMapping: mutable.Map[String,Any] = mutable.Map()
-  //
+  // this Map is similar to MethodMapping but this one is used for NestedMethod Implementation
   private val NestedMethodMapping: mutable.Map[String,Any] = mutable.Map()
   // this variable is a stack which has the classname which is executed in ClassDef Operation
   private val classname = mutable.Stack[String]()
@@ -47,6 +47,7 @@ object SetClass:
 
         // this operation takes multiple SetDSL.SetOp1 operations as parameter and stores them in a Map
         // this implementation as both NestedClass Implementation and Class Implementation
+        // it creates a map with classname which points to operations in Constructor
         case Constructor(op*) =>
           if(classname.length>1){
             val innerclass = Map(classname.top -> op)
@@ -109,7 +110,9 @@ object SetClass:
             z.pop()
           }
 
-        //
+        // this operation is used to create a object of nestedclass it takes three parameters one is parent object the nestedclassname
+        // and the object name we want to assign the classname 
+        // this method also evaluates the constructor inside the nestedclass and returns it 
         case NestedClassObject(parent,name,obj)=>
           NestedObjectMapping += obj -> List(ObjectMapping(parent),name)
           val classname= ObjectMapping(parent)
@@ -120,7 +123,9 @@ object SetClass:
           }
           z.pop()
 
-        //
+        // this operation is used to call a method in the class 
+        // to call this method we are passing the object name of the class and the method name
+        // the return value of this operation is the last expression of the Method 
         case InvokeMethod(obj,name) =>
           val classname = ObjectMapping(obj)
           val z: mutable.Stack[Any] = mutable.Stack()
@@ -140,7 +145,7 @@ object SetClass:
             z.pop()
           }
 
-        //
+        // this method works same as InvokeMethod but this method is used to invoke method of nested class
         case NestedClassMethod(obj,name) =>
           val nestedmethod: Map[String,Map[String,Seq[SetDSL.SetOp1]]] = NestedMethodMapping(NestedObjectMapping(obj)(0)).asInstanceOf[Map[String,Map[String,Seq[SetDSL.SetOp1]]]]
           val z: mutable.Stack[Any] = mutable.Stack()
@@ -149,7 +154,8 @@ object SetClass:
           }
           z.pop()
 
-        //
+        // this operation is used to do inheritance 
+        // class with name1 extends class with name
         case Extends(name,name1) =>
           InheritStatus(name1) += 1
           if(InheritStatus(name1) == 2){
@@ -157,7 +163,7 @@ object SetClass:
           }
           InheritMapping(name1) = name
 
-        //
+        // this method unwraps the contents of class and evaluates each individual operation in it
         case ClassDef(name,y*) =>
           classname.push(name)
           InheritStatus+= (name-> 0)
