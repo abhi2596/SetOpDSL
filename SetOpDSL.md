@@ -1,7 +1,7 @@
 # To run this DSL
 Navigate from src to main 
 In main SetDSL.scala is the file which contains the code 
-For testing navigate to test in test SetDSLtest.scala
+For testing navigate to test in test SetDSLtest.scala is the file which contains the test cases for this code.
 
 
 # SetOpDSL
