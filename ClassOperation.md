@@ -41,6 +41,7 @@ existing set
 # Extends()
 Extends is used to implement Inheritance so for this to work first we need to define two classes using ClassDef 
 Extends takes two parameters both are classnames one is classname which will act as parentClass and other is class which will inherit from parentClass
+Multiple inheritance is not supported Extends("setop","setop1") , Extends("setop","setop1") here setop1 is implemented two times so the code will return an error message saying multiple inheritance is not implemented
 
 Example : Extends("setop","setop1") here class setop1 inherits properties from class setop
 
@@ -59,3 +60,6 @@ this operation takes two parameters one is object name of nested class and name 
 
 Example : referring to the above example 
 NestedClassMethod("y","name1") which will return Set(1,2,5,6) 
+
+# NotImplemented
+Passing parameters to constructors and methods is not implemented
