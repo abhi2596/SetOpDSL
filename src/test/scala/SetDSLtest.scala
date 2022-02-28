@@ -62,5 +62,5 @@ class YourSetTheoryLanguageTest extends AnyFlatSpec with Matchers {
     val macrounion = Assign(SetName("SomeSetName3"),Macro("UnionSetOp")).eval
     macrounion.asInstanceOf[Set[Any]] should contain allOf (2,6,4)
   }
-  
+
 }
