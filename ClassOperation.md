@@ -1,5 +1,8 @@
 # ClassOperation 
 
+# To run 
+Navigate from src to main In main SetClassImp.scala is the file which contains the code For testing navigate to test in test SetClassImptest.scala
+
 # Field()
 Field takes one argument which is a string this string is the name of field variable
 Field operation has a value which acts as instance variable of class which will be initialized in Constructor of that class
