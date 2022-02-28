@@ -1,5 +1,7 @@
 # To run this DSL
-Download the files from this repository and open it using IntelliJ Idea or one other IDEA the source file contains a main folder which has the code and to test there is a test folder which contains the test cases on which these code is tested
+run navigate from src to main 
+In main SetDSL.scala is the file which contains the code 
+For testing navigate to test in test SetDSLtest.scala
 
 
 # SetOpDSL
