@@ -1,5 +1,5 @@
 # To run this DSL
-run navigate from src to main 
+Navigate from src to main 
 In main SetDSL.scala is the file which contains the code 
 For testing navigate to test in test SetDSLtest.scala
 
