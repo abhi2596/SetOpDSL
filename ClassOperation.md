@@ -1,7 +1,7 @@
 # ClassOperation 
 
 # To run 
-Navigate from src to main In main SetClassImp.scala is the file which contains the code For testing navigate to test in test SetClassImptest.scala
+Navigate from src to main In main SetClassImp.scala is the file which contains the code. For testing navigate to test in test SetClassImptest.scala is the file which contains the test cases for this code.
 
 # Field()
 Field takes one argument which is a string this string is the name of field variable
