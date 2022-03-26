@@ -59,5 +59,4 @@ In this implementation it will give an error and the error message is as follows
 Interfaces may not be directly instantiated.
 In this implementation it will give an error and the error message is as follows "Interface cannot be instantiated"
 
-Not implemented nested interfaces and nested abstract classes 
-Not implemented access modifiers in classes,interfaces,abstract classes
+Not implemented nested interfaces and nested abstract classes,Not implemented access modifiers in classes,interfaces,abstract classes
