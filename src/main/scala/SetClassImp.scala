@@ -4,7 +4,9 @@ import collection.*
 
 object SetClass:
   // this Map is used to bind classname to a Map of methodname and the sequence of operations in it
-  private val MethodMapping: mutable.Map[String,Map[String,Seq[SetDSL.SetOp1]]] = mutable.Map()
+  private val MethodMapping: mutable.Map[String,mutable.Map[String,Seq[SetDSL.SetOp1]]] = mutable.Map()
+  // this Map is used to create Abstract method mapping it maps a classname to abstract method name
+  private val AbstractMethodMapping: mutable.Map[String,Set[String]] = mutable.Map()
   // this Map is used to bind classname to sequence of Operation defined inside Constructor
   private val ConstructorMapping: mutable.Map[String,Seq[SetDSL.SetOp1]] = mutable.Map()
   // this Map binds Objectname to a classname
@@ -12,7 +14,7 @@ object SetClass:
   // this Map is similar to ConstructorMapping but this one is used for NestedClass Implementation
   // this Map has outerClassname which maps to InnerClassName which further maps to MethodName and its Sequence Of operations
   private val NestedConstructorMapping: mutable.Map[String,Any] = mutable.Map()
-  // this Map is similar to MethodMapping but this one is used for NestedMethod Implementation
+  // this Mapping is used to implement NestedMethodMapping
   private val NestedMethodMapping: mutable.Map[String,Any] = mutable.Map()
   // this variable is a stack which has the classname which is executed in ClassDef Operation
   private val classname = mutable.Stack[String]()
@@ -25,17 +27,24 @@ object SetClass:
   // this Mapping is used to check multiple inheritance
   // it Maps classname and number of times it is inherited
   private val InheritStatus : mutable.Map[String,Int] = mutable.Map()
+  private val abstractclassname : mutable.Set[String] = mutable.Set()
+
+  private val interfacename : mutable.Set[String] = mutable.Set()
+
   // enum class which contains the case classes used in this Implementation
   enum SetClassImp:
     case Value(a:String)
     case Field(x:String)
     case Constructor(x:SetDSL.SetOp1*)
     case Method(name:String,y:SetDSL.SetOp1*)
+    case AbstractMethod(name:String)
     case ClassDef(name:String,y:SetClassImp*)
+    case AbstractClassDef(name:String,y:SetClassImp*)
+    case InterfaceDecl(name:String,y:SetClassImp*)
     case NewObject(name:String,obj:String)
     case InvokeMethod(name:String, obj:String)
-    case Mapping(name:String,y:SetClassImp)
     case Extends(name:String,name1:String)
+    case Implements(name:String,name1:String*)
     case NestedClassObject(parentObj:String,name:String,obj:String)
     case NestedClassMethod(obj:String,name:String)
 
@@ -44,10 +53,8 @@ object SetClass:
       this match {
         // the evaluation just returns the contents in it
         case Field(a) => a
-
         // this operation takes multiple SetDSL.SetOp1 operations as parameter and stores them in a Map
         // this implementation as both NestedClass Implementation and Class Implementation
-        // it creates a map with classname which points to operations in Constructor
         case Constructor(op*) =>
           if(classname.length>1){
             val innerclass = Map(classname.top -> op)
@@ -79,7 +86,7 @@ object SetClass:
               MethodMapping(classname.top) += name -> op
             }
             else{
-              MethodMapping += classname.top->Map()
+              MethodMapping += classname.top-> mutable.Map()
               MethodMapping(classname.top) += name -> op
             }
           }
@@ -88,31 +95,21 @@ object SetClass:
         // It also evaluates Constructor within the class and returns it
         // It also checks if the class is inherited if yes then evaluates parentClass Constructor as well
         case NewObject(name,obj) =>
-          val status = InheritStatus(name)
+          if (abstractclassname.contains(name)){
+            return "Abstract class cannot be instantiated"
+          }
+          if (interfacename.contains(name)){
+            return "Interface cannot be instantiated"
+          }
           val z : mutable.Stack[Any] = mutable.Stack()
           ObjectMapping += obj-> name
-          if ( status == 0){
-            val setop = ConstructorMapping(name)
-            for (n<-setop){
-              z.push(Scope(obj,n).eval)
-            }
-            z.pop()
+          val setop = ConstructorMapping(name)
+          for (n<-setop){
+            z.push(Scope(obj,n).eval)
           }
-          else{
-            val setop = ConstructorMapping(InheritMapping(name).asInstanceOf[String])
-            for (n<-setop) {
-              z.push(Scope(obj, n).eval)
-            }
-            val setop1 = ConstructorMapping(name)
-            for (n<-setop1){
-              z.push(Scope(obj,n).eval)
-            }
-            z.pop()
-          }
+          z.pop()
 
-        // this operation is used to create a object of nestedclass it takes three parameters one is parent object the nestedclassname
-        // and the object name we want to assign the classname 
-        // this method also evaluates the constructor inside the nestedclass and returns it 
+        //
         case NestedClassObject(parent,name,obj)=>
           NestedObjectMapping += obj -> List(ObjectMapping(parent),name)
           val classname= ObjectMapping(parent)
@@ -123,29 +120,16 @@ object SetClass:
           }
           z.pop()
 
-        // this operation is used to call a method in the class 
-        // to call this method we are passing the object name of the class and the method name
-        // the return value of this operation is the last expression of the Method 
+        //
         case InvokeMethod(obj,name) =>
           val classname = ObjectMapping(obj)
           val z: mutable.Stack[Any] = mutable.Stack()
-          if (MethodMapping(classname).contains(name)){
-            val method: Seq[SetDSL.SetOp1] = MethodMapping(classname)(name)
-            for (n<-method){
-              z.push(Scope(obj,n).eval)
-            }
-            z.pop()
+          val method: Seq[SetDSL.SetOp1] = MethodMapping(classname)(name)
+          for (n<-method){
+            z.push(Scope(obj,n).eval)
           }
-          else{
-            val inheritclassname = InheritMapping(classname)
-            val method: Seq[SetDSL.SetOp1] = MethodMapping(inheritclassname.asInstanceOf[String])(name)
-            for (n<-method){
-              z.push(Scope(obj,n).eval)
-            }
-            z.pop()
-          }
+          z.pop()
 
-        // this method works same as InvokeMethod but this method is used to invoke method of nested class
         case NestedClassMethod(obj,name) =>
           val nestedmethod: Map[String,Map[String,Seq[SetDSL.SetOp1]]] = NestedMethodMapping(NestedObjectMapping(obj)(0)).asInstanceOf[Map[String,Map[String,Seq[SetDSL.SetOp1]]]]
           val z: mutable.Stack[Any] = mutable.Stack()
@@ -154,43 +138,223 @@ object SetClass:
           }
           z.pop()
 
-        // this operation is used to do inheritance 
-        // class with name1 extends class with name
+        //
         case Extends(name,name1) =>
           InheritStatus(name1) += 1
           if(InheritStatus(name1) == 2){
             return "Multiple Inheritance not allowed"
           }
+          if(interfacename.contains(name1)){
+            if(!interfacename.contains(name)){
+              return "Interface cannot inherit from a class"
+            }
+          }
+          val MethodMapping3: mutable.Map[String,mutable.Map[String,Seq[SetDSL.SetOp1]]] = mutable.Map()
+          MethodMapping3(name1) = mutable.Map()
+          if (MethodMapping.contains(name)){
+            if (MethodMapping.contains(name1)){
+              for(n<-MethodMapping(name)){
+                MethodMapping3(name1) += n
+              }
+              for(n<- MethodMapping(name1)){
+                MethodMapping3(name1) += n
+              }
+              for(n<- MethodMapping3(name1)){
+                MethodMapping(name1) += n
+              }
+            }
+            else{
+              MethodMapping += name1-> mutable.Map()
+              for(n<- MethodMapping(name1)){
+                MethodMapping3(name1) += n
+              }
+              for(n<- MethodMapping3(name1)){
+                MethodMapping(name1) += n
+              }
+            }
+          }
+          if(AbstractMethodMapping.contains(name)){
+            if (AbstractMethodMapping.contains(name1)){
+              for(n<-AbstractMethodMapping(name)){
+                AbstractMethodMapping(name1) += n
+              }
+            }
+            else{
+              if(abstractclassname.contains(name1)){
+                AbstractMethodMapping += name1-> Set()
+                for(n<-AbstractMethodMapping(name)){
+                  AbstractMethodMapping(name1) += n
+                }
+              }
+              else{
+                for(n<-AbstractMethodMapping(name)){
+                  if(!MethodMapping(name1).contains(n)){
+                    return "Class should implement all abstract methods"
+                  }
+                }
+              }
+            }
+          }
+          if(ConstructorMapping.contains(name)){
+            if(ConstructorMapping.contains(name1)){
+              ConstructorMapping(name1) =  ConstructorMapping(name) ++ ConstructorMapping(name1)
+            }
+            else{
+              ConstructorMapping += name1 -> ConstructorMapping(name)
+            }
+          }
           InheritMapping(name1) = name
 
-        // this method unwraps the contents of class and evaluates each individual operation in it
-        case ClassDef(name,y*) =>
+        //
+        case Implements(className, intername*) =>
+          if(interfacename.contains(className)){
+            return "interface cannot implement another interface"
+          }
+          for(name<- intername) {
+            if (interfacename.contains(name)) {
+              if (!abstractclassname.contains(className)) {
+                for (n <- AbstractMethodMapping(name)) {
+                  if (!MethodMapping(className).contains(n)) {
+                    return "Class should implement all the methods of interface"
+                  }
+                }
+              }
+              else {
+                if (AbstractMethodMapping.contains(className)) {
+                  for (n <- AbstractMethodMapping(name)) {
+                    AbstractMethodMapping(className) += n
+                  }
+                }
+                else {
+                  AbstractMethodMapping += className -> Set()
+                  for (n <- AbstractMethodMapping(name)) {
+                    AbstractMethodMapping(className) += n
+                  }
+                }
+              }
+            }
+          }
+
+        case AbstractMethod(name) =>
+          if (!abstractclassname.contains(classname.top) && !interfacename.contains(classname.top)){
+            return 1
+          }
+          if(AbstractMethodMapping.contains(classname.top)){
+            AbstractMethodMapping(classname.top) += name
+          }
+          else{
+            AbstractMethodMapping += classname.top -> Set()
+            AbstractMethodMapping(classname.top) += name
+          }
+          if(AbstractMethodMapping.contains(classname.top)){
+            AbstractMethodMapping(classname.top) += name
+          }
+          else{
+            AbstractMethodMapping += classname.top -> Set()
+            AbstractMethodMapping(classname.top) += name
+          }
+          AbstractMethodMapping(classname.top)
+
+        case InterfaceDecl(name,y*) =>
           classname.push(name)
+          if(classname.length>1){
+            println(1)
+          }
+          interfacename += name
           InheritStatus+= (name-> 0)
           for(n<-y){
             n.evaluate
           }
           MMApping.remove(classname.top)
           classname.pop()
+
+        case AbstractClassDef(name,y*) =>
+          classname.push(name)
+          abstractclassname += name
+          InheritStatus+= (name-> 0)
+          for(n<-y){
+            n.evaluate
+          }
+          MMApping.remove(classname.top)
+          classname.pop()
+
+        case ClassDef(name,y*) =>
+          classname.push(name)
+          InheritStatus+= (name-> 0)
+          val z: mutable.Set[Any] = mutable.Set()
+          for(n<-y){
+            z.add(n.evaluate)
+          }
+          MMApping.remove(classname.top)
+          classname.pop()
+          if (z.contains(1)){
+            return "Class cannot have abstract methods in it"
+          }
       }
 
 
 
   @main def runDSL: Unit =
     import SetClassImp.*
-    var expression = ClassDef("setop",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name",Insert(SetName("a"),Valset(7,8)),Insert(SetName("a"),Valset(7,8)))).evaluate
-    //    expression = ClassDef("setOp2",Field("a"),Constructor(Assign(SetName("a"),Valset(1,2)))).evaluate
-    //    expression = ClassDef("setop1",Field("a"),Constructor(Assign(SetName("a"),Valset(1,2))),Method("name",Insert(SetName("a"),Valset(3,4)))).evaluate
-    //    expression = Extends("setop","setop1").evaluate
-    //    expression = Extends("setOp2","setop1").evaluate
-    //    println(expression)
-    expression = NewObject("setop","z").evaluate
-    expression = InvokeMethod("z","name").evaluate
+    var expression = InterfaceDecl("setop",InterfaceDecl("inf",AbstractMethod("name")),AbstractMethod("name1")).evaluate
+    //    println(NestedMethodMapping)
     println(expression)
+//    var expression = AbstractClassDef("setop",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name")).evaluate
+//    expression = ClassDef("setop2",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name1",Assign(SetName("a"),Valset(1,2)))).evaluate
+//    expression = Extends("setop","setop2").evaluate
+//    println(expression)
+//    expression = Interface("setop1",AbstractMethod("name2"),AbstractMethod("name3")).evaluate
+//    expression = Implements("setop","setop1").evaluate
+//    println(expression)
+//    expression = AbstractClassDef("setop1",Method("name",Assign(SetName("a"),Valset(1,2)))).evaluate
+//    expression = Implements("setop","setop1").evaluate
+//      var expression = ClassDef("setop2",Field("b"),Constructor(Assign(SetName("b"),Valset(1,2))),Method("name1",Insert(SetName("b"),Valset(3,4)))).evaluate
+//      expression = NewObject("setop2","z").evaluate
+//      println(FieldMapping)
+//      println(expression)
+//    expression = Extends("setop1","setop2").evaluate
+//    println(MethodMapping("setop2"))
+//    println(expression)
+//    var expression = Interface("setop",AbstractMethod("name"),AbstractMethod("name1")).evaluate
+//    expression = AbstractClassDef("setop1",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name",Assign(SetName("x"),Valset(1,2)))).evaluate
+//    expression = Implements("setop","setop1")
+//    expression = ClassDef("setop2",Field("b"),Constructor(Assign(SetName("b"),Valset(3,4))),)
+//    expression = Interface("setop1",AbstractMethod("name3")).evaluate
+//    expression = Implements("setop","setop1").evaluate
+//    println(AbstractMethodMapping)
+//    println(expression)
+//    var expression = AbstractClassDef("setop",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name")).evaluate
+//    expression = AbstractClassDef("setop1",Field("b"),Constructor(Assign(SetName("b"),Valset(5,6))),Method("name",Insert(SetName("a"),Valset(4,5))),AbstractMethod("name1")).evaluate
+//    expression = Extends("setop","setop1").evaluate
+//    expression = ClassDef("setop2",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name1",Insert(SetName("a"),Valset(1,2)))).evaluate
+//    expression = NewObject("setop","z").evaluate
+//    println(expression)
+//    expression = Extends("setop1","setop2").evaluate
+//    println(expression)
+//    expression = AbstractClassDef("setop1",Field("b"),Constructor(Assign(SetName("b"),Valset(5,6))),Method("name1",Insert(SetName("b"),Valset(1,2)))).evaluate
+//    expression = Extends("setop","setop1").evaluate
+//    println(ConstructorMapping("setop1"))
+//    println(MethodMapping)
+//    println(AbstractMethodMapping)
+//    println(expression)
+//    var expression = ClassDef("setop",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name1")).evaluate
+//    println(expression)
+//    expression = ClassDef("setop2",Field("c"),Constructor(Assign(SetName("c"),Valset(1,2))),Method("name",Insert(SetName("a"),Valset(3,4)))).evaluate
+//    expression = Extends("setop1","setop2").evaluate
+//    expression = NewObject("setop1","z").evaluate
+//    println(expression)
+//    println(ConstructorMapping("setop2"))
+//    println(MethodMapping("setop2"))
+//    expression = InvokeMethod("z","name1").evaluate
 //    expression = InvokeMethod("z","name").evaluate
 //    println(expression)
+//    println(abstractmethodname)
+//    println(MethodMapping)
+//    println(ConstructorMapping)
+//    println(AbstractMethodMapping)
+//    expression = NewObject("setop","z").evaluate
+//    var expression = Interface("setop",Method("name"),Method("name1"))
+//    expression = NewObject("setop","z")
 //    println(expression)
-//    println(ConstructorMapping("setop1"))
-//    println(MethodMapping("setop1"))
-
+//    println(expression)
 

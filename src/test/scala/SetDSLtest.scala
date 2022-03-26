@@ -22,20 +22,20 @@ class YourSetTheoryLanguageTest extends AnyFlatSpec with Matchers {
     Delete(SetName("someSetName"),Value(3.0)).eval
     Check(SetName("someSetName"), Value(3.0)).eval shouldBe false
   }
-//
+
   it should "test different set operations" in {
     Assign(SetName("someSetName"),Create(Value(1),Value(4))).eval
     Insert(SetName("someSetName"),Create(Value("string"),Value(5))).eval
     Assign(SetName("someSetName1"),Create(Value(2),Value("string"))).eval
     Insert(SetName("someSetName1"),Create(Value(1),Value("somestring"))).eval
     val union = Union(SetName("someSetName"),SetName("someSetName1")).eval
-    union.asInstanceOf[Set[Any]] should contain allOf (1,2,3,"string","somestring",5)
+    union.asInstanceOf[Set[Any]] should contain allOf (1,2,4,"string","somestring",5)
     val setDiff = SetDifference(SetName("someSetName"),SetName("someSetName1")).eval
     setDiff.asInstanceOf[Set[Any]] should contain allOf (4,5)
     val intersection = Intersection(SetName("someSetName"),SetName("someSetName1")).eval
     intersection.asInstanceOf[Set[Any]] should contain allOf (1,"string")
   }
-////
+
   it should "test Set Operations Symmeteric Difference and Cartesian Product" in {
     Assign(SetName("SetName"),Create(Value(2),Value(6))).eval
     Insert(SetName("SetName"),Create(Value(7),Value(9))).eval
