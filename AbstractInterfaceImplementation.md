@@ -36,18 +36,19 @@ No a interface can only inherit from an interface. In this implementation if a i
 No an interface cannot implement another interface. In this implementation an error will be returned that "interface cannot implement another interface".
 
 ### Can a class implement two or more different interfaces that declare methods with exactly the same signatures?
-In this implementation we dont have method signatures like int or double so a class can implement two or more interfaces with same method as return type is always a Set
+Yes, a class can implement two interfaces with the same method signature but that method should be implemented only once in the class.In this implementation we dont have method signatures like int or double so a class can implement two or more interfaces with same method as return type is always a Set
 
 ### Can an abstract class inherit from another abstract class and implement interfaces where all interfaces and the abstract class have methods with the same signatures?
 An abstract class can inherit from another abstract class and as already explained the interfaces and abstract class methods have same signature here as we are not mentioning the return type of the method. So in this implementation if we declare Methods with same name then the abstract class methods will override the interface
-methods
+methods.
 
 ### Can an abstract class implement interfaces?
-Yes a abstract class can implement interfaces it can partially or fully implement an interface. If a abstract class implements an interface partially i.e. it did not implement all the methods in the interface then if a class inherits the abstract class then this class should implement the remaining methods of interface which abstract class did not implement.
+Yes a abstract class can implement interfaces it can just implement interface without providing implementation. If a abstract class implements an interface partially i.e. it did not implement all the methods in the interface then if a class inherits the abstract class then this class should implement the remaining methods of interface which abstract class did not implement.
 In this implementation abstract class can implement an interface and follows the rules as mentioned above
 
 ### Can a class implement two or more interfaces that have methods whose signatures differ only in return types?
-Return type in this implementation is always a set so the signature does not change so two interfaces can have method with same name and a class can implement this 
+No, its an error.If two interfaces contain a method with the same signature but different return types, then it is impossible to implement both the interface simultaneously.
+But in this implementation as the return type is always a set so the signature does not change so two interfaces can have method with same name and a class can implement this 
 methods
 
 ### Can an abstract class inherit from a concrete class?
