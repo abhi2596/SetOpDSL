@@ -20,6 +20,13 @@ class AbstractClassInterfaceImplementation extends AnyFlatSpec with Matchers {
     NewObject("inf","z").evaluate shouldEqual "Interface cannot be instantiated"
   }
 
+  it should "Class and Interface cannot have inherit itself" in {
+    ClassDef("cii",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name1")).evaluate
+    Extends("cii","cii").evaluate shouldEqual "Class cannot inherit itself"
+    InterfaceDecl("infcii",Field("a"),AbstractMethod("name")).evaluate
+    Extends("infcii","infcii").evaluate shouldEqual "Interface cannot inherit itself"
+  }
+
   it should "Child Class should implement all abstract methods of parent abstract class" in {
     var expression = AbstractClassDef("abcm",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name")).evaluate
     expression = ClassDef("ciabcm",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name1",Assign(SetName("a"),Valset(1,2)))).evaluate

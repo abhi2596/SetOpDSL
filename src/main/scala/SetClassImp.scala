@@ -142,6 +142,14 @@ object SetClass:
 
         // this method is used to implement Inheritance
         case Extends(name,name1) =>
+          if(name==name1){
+            if(interfacename.contains(name)){
+              return "Interface cannot inherit itself"
+            }
+            else{
+              return "Class cannot inherit itself"
+            }
+          }
           InheritStatus(name1) += 1
           if(InheritStatus(name1) == 2){
             return "Multiple Inheritance not allowed"
@@ -167,12 +175,13 @@ object SetClass:
             }
             else{
               MethodMapping += name1-> mutable.Map()
-              for(n<- MethodMapping(name1)){
+              for(n<- MethodMapping(name)){
                 MethodMapping3(name1) += n
               }
               for(n<- MethodMapping3(name1)){
                 MethodMapping(name1) += n
               }
+              println(MethodMapping)
             }
           }
           if(AbstractMethodMapping.contains(name)){
@@ -300,12 +309,13 @@ object SetClass:
 
   @main def runDSL: Unit =
     import SetClassImp.*
-    var expression = InterfaceDecl("setop",InterfaceDecl("inf",AbstractMethod("name")),AbstractMethod("name1")).evaluate
-    //    println(NestedMethodMapping)
-    println(expression)
+//    var expression = InterfaceDecl("setop",AbstractMethod("name"),AbstractMethod("name1")).evaluate
+//    println(expression)
 //    var expression = AbstractClassDef("setop",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name")).evaluate
 //    expression = ClassDef("setop2",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name1",Assign(SetName("a"),Valset(1,2)))).evaluate
-//    expression = Extends("setop","setop2").evaluate
+//    expression = Extends("setop2","setop").evaluate
+//    println(ConstructorMapping("setop2"))
+//    println(MethodMapping("setop2"))
 //    println(expression)
 //    expression = Interface("setop1",AbstractMethod("name2"),AbstractMethod("name3")).evaluate
 //    expression = Implements("setop","setop1").evaluate
