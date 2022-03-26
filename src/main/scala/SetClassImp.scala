@@ -27,8 +27,9 @@ object SetClass:
   // this Mapping is used to check multiple inheritance
   // it Maps classname and number of times it is inherited
   private val InheritStatus : mutable.Map[String,Int] = mutable.Map()
+  // this set contains abstract class names
   private val abstractclassname : mutable.Set[String] = mutable.Set()
-
+  // this set contains interface names
   private val interfacename : mutable.Set[String] = mutable.Set()
 
   // enum class which contains the case classes used in this Implementation
@@ -109,7 +110,7 @@ object SetClass:
           }
           z.pop()
 
-        //
+        // this method is used to create an Object of nestedclass
         case NestedClassObject(parent,name,obj)=>
           NestedObjectMapping += obj -> List(ObjectMapping(parent),name)
           val classname= ObjectMapping(parent)
@@ -120,7 +121,7 @@ object SetClass:
           }
           z.pop()
 
-        //
+        // this method is used to invoke a method with obj name and the name of the method
         case InvokeMethod(obj,name) =>
           val classname = ObjectMapping(obj)
           val z: mutable.Stack[Any] = mutable.Stack()
@@ -130,6 +131,7 @@ object SetClass:
           }
           z.pop()
 
+        // this method is used to invoke NestedClassmethod
         case NestedClassMethod(obj,name) =>
           val nestedmethod: Map[String,Map[String,Seq[SetDSL.SetOp1]]] = NestedMethodMapping(NestedObjectMapping(obj)(0)).asInstanceOf[Map[String,Map[String,Seq[SetDSL.SetOp1]]]]
           val z: mutable.Stack[Any] = mutable.Stack()
@@ -138,7 +140,7 @@ object SetClass:
           }
           z.pop()
 
-        //
+        // this method is used to implement Inheritance
         case Extends(name,name1) =>
           InheritStatus(name1) += 1
           if(InheritStatus(name1) == 2){
@@ -205,7 +207,7 @@ object SetClass:
           }
           InheritMapping(name1) = name
 
-        //
+        // this method is used to implement interfaces
         case Implements(className, intername*) =>
           if(interfacename.contains(className)){
             return "interface cannot implement another interface"
@@ -235,6 +237,7 @@ object SetClass:
             }
           }
 
+        // this method creates Abstract method Mapping
         case AbstractMethod(name) =>
           if (!abstractclassname.contains(classname.top) && !interfacename.contains(classname.top)){
             return 1
@@ -255,6 +258,7 @@ object SetClass:
           }
           AbstractMethodMapping(classname.top)
 
+        // this method used to implement interface declaration
         case InterfaceDecl(name,y*) =>
           classname.push(name)
           if(classname.length>1){
@@ -267,7 +271,7 @@ object SetClass:
           }
           MMApping.remove(classname.top)
           classname.pop()
-
+        // this method is used to create AbstractClass Definitions
         case AbstractClassDef(name,y*) =>
           classname.push(name)
           abstractclassname += name
@@ -277,7 +281,7 @@ object SetClass:
           }
           MMApping.remove(classname.top)
           classname.pop()
-
+        // this method is used to create Class Defintions
         case ClassDef(name,y*) =>
           classname.push(name)
           InheritStatus+= (name-> 0)
