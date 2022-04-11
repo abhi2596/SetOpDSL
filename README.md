@@ -8,7 +8,7 @@ We can clone the project using git clone for this git should be installed in the
 ## Using IntelliJ
   -Must have IntelliJ installed.
   -Must have Java 17 installed and active in IntelliJ.
-  -Must install Scala SDK and sbt plugins in IintelliJ.
+  -Must install Scala SDK and sbt plugins in IntelliJ.
   - Open the files using IntelliJ Idea or one other IDEA the source file contains a main folder which has the code and to test there is a test folder which contains the test cases on which these code is tested
   
 ## Using Command Line:
@@ -20,3 +20,4 @@ We can clone the project using git clone for this git should be installed in the
 ## [SetOperations instructions](SetOpDSL.md)
 ## [ClassOperations instructions](ClassOperation.md)
 ## [AbstractClassinterface instructions](AbstractInterfaceImplementation.md)
+## [ExceptionIfElse instructions](ExceptionHandlingIfElse.md)
