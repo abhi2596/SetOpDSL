@@ -3,7 +3,7 @@
 
 To run this Project we can download the zip file using the code dropdown there is an option to download zip file
 or 
-We can clone the project using git clone for this git should be installed in the desktop using git bash we can clone this repository git clone https://github.com/abhi2596/SetOpDSL.git
+We can clone the project using git clone for this git should be installed in the desktop using git bash we can clone this repository git clone https://github.com/abhi2596/SetOpDSL/edit/HW4
 
 ## Using IntelliJ
   -Must have IntelliJ installed.
