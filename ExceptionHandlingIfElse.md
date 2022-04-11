@@ -19,7 +19,7 @@ If we call Else() directly it returns an error message "Cannot use else without 
 IF construct takes three arguments one is condition, second is Then function and the other is Else function
 condition is of Type SetDSL.SetOp1 expressions it can contain two expressions Check() and Delete() which can be used as
 conditions as they return boolean. For the documentation of SetDSL.SetOp1 refer to this 
-#### [link](SetOpDSL.md).
+## [link](SetOpDSL.md).
 
 
 ### Example 
@@ -46,7 +46,7 @@ So in this implementation throw will create a NewObject of the exception classna
 message. The throw implementation will take the msg and assign it to a variable which can be retrieved by Catch() 
 
 For ClassDef and NewObject documentation refer to this 
-##### [link](ClassOperation.md)
+## [link](ClassOperation.md)
 
 ### Example
 Throw(NewObject("exception","z"))
