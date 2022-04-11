@@ -13,6 +13,7 @@ object SetExIf:
   // this flags are used so as to not execute only then class or Else class or Try class or Catch class
   private val ifelseflag : mutable.Stack[Any] = mutable.Stack(0)
   private val trycatchflag : mutable.Stack[Any] = mutable.Stack(0)
+  private val nestedflag : mutable.Map[String,Int] = mutable.Map()
 
   // enum class used to implement Exception handling and If else
   enum ExIf:
@@ -26,7 +27,7 @@ object SetExIf:
     case Catch(op:Any*)
     case Throw(op:SetClass.SetClassImp)
     case getMsg()
-    case CatchException(Try:ExIf,Catch:ExIf)
+    case CatchException(name:String,Try:ExIf,Catch:ExIf)
 
 
 
@@ -141,14 +142,25 @@ object SetExIf:
           Msg.last
         // this case class evaluates the CatchException which takes two operands one is try block
         // the other operand is catch block
-        case CatchException(op,op1)=>
+        case CatchException(name,op,op1)=>
           trycatchflag.push(1)
+          if(nestedflag.contains(name)){
+            nestedflag(name) += 1
+          }
+          else{
+            nestedflag += (name -> 0)
+          }
           val a:mutable.Stack[Any] = mutable.Stack()
           a.push(op.eval)
           if(flag.top==1){
             flag.pop()
             a.push(op1.eval)
+            if(nestedflag(name) >0){
+              flag.push(1)
+            }
           }
+          nestedflag(name) -=1
+          trycatchflag.pop()
           a.pop()
       }
 
@@ -156,7 +168,16 @@ object SetExIf:
 
   @main def runIt:Unit =
     import ExIf.*
-    var expression = Catch(getMsg()).eval
+    var expression = ExceptionClass(ClassDef("exception",Field("a"),Constructor(Assign(SetName("a"),Valset("exception"))))).eval
+    expression = Assign(SetName("a"),Valset(1,2)).eval
+    expression = CatchException("exception",Try(
+      CatchException("exception",Try(
+        Throw(NewObject("exception","z"))),
+        Catch(getMsg())),Insert(SetName("a"),Valset(3,4))),
+      Catch(getMsg())).eval
+    println(expression)
+    expression = getSet("a").eval
+//    var expression = Catch(getMsg()).eval
     println(expression)
 //    var expression = Assign(SetName("b"),Valset(3,4)).eval
 //    expression = Then(Assign(SetName("x"),Valset(1,2))).eval

@@ -1,4 +1,6 @@
 import SetDSL.SetOp1.*
+import SetExIf.ExIf.CatchException
+
 import collection.*
 
 
