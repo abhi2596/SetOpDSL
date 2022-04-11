@@ -1,4 +1,6 @@
-# ClassOperation 
+# ClassOperation Documentation
+
+HW2 implementation is in src/main/scala/SetClassImp and the testcases are in test/scala/SetClassImptest
 
 # Field()
 Field takes one argument which is a string this string is the name of field variable

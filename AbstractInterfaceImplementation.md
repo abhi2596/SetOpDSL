@@ -1,4 +1,6 @@
-# HW3 Documentation
+# Abstract Interface Implementation Documentation
+
+HW3 implementation is in src/main/scala/SetClassImp and the testcases are in test/scala/AbstractInterfaceImp
 
 ## AbstractMethod()
 AbstractMethod takes one parameter which is the name of the method and it is a string

@@ -1,5 +1,6 @@
 # Exception Handling and IF Else Construct Implementation
 
+HW4 implementation is in src/main/scala/SetExIf and the testcases are in test/scala/ExceptionIfElse
 
 ## Then(op*),Else(op*)
 Then() and Else() are functions which takes variable number of arguments which can contain different operations which
