@@ -31,10 +31,16 @@ object SetDSL:
     case Scope(x:String,y:SetOp1*)
     case bindingMacro(x:String,y:SetOp1)
     case Macro(x:String)
+    case getSet(name:String)
+    case getScopeSet(scope:String,name:String)
 
     // this is the evaluation function for the SetOperations
     def eval: Any=
       this match{
+        case getSet(name)=>
+          SetBinding(name)
+        case getScopeSet(scope,name) =>
+          ScopeBinding(scope)(name)
         // Value(x) just returns the value passed
         case Value(x)=> x
         // Variable(x) takes a string and checks if it is present in the binding if yes then returns it else assigns a value of 0

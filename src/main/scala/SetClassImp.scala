@@ -34,7 +34,6 @@ object SetClass:
 
   // enum class which contains the case classes used in this Implementation
   enum SetClassImp:
-    case Value(a:String)
     case Field(x:String)
     case Constructor(x:SetDSL.SetOp1*)
     case Method(name:String,y:SetDSL.SetOp1*)
