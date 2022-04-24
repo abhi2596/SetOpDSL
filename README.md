@@ -31,8 +31,7 @@ takes two arguments one is SetName and the other is Create Create should contain
 #### Example: Insert(SetName("someSetName"),Create(Value(1),Variable("string")))  
 
 ## Assign() 
-takes two arguments like Insert() the only difference between Insert and Assign is Assign checks if the SetName is present or not if not present it creates a new one 
-and assigns the values specified in Create to the a set which can later be referenced by the SetName() 
+Assign takes two arguments one SetName and and the other is Create or Valset, Assign creates a new set in the language with values specified in Create and Valset  
 #### Example: Assign(SetName("setName"),Create(Value(1),Variable("string")))
 
 ## Check() 
