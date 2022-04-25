@@ -105,12 +105,16 @@ object SetClass:
           }
           val z : mutable.Stack[Any] = mutable.Stack()
           ObjectMapping += obj-> name
-          val setop = ConstructorMapping(name)
-          for (n<-setop){
-            z.push(Scope(obj,n).eval)
+          if(ConstructorMapping.contains(name)){
+            val setop = ConstructorMapping(name)
+            for (n<-setop){
+              z.push(Scope(obj,n).eval)
+            }
+            z.pop()
           }
-          z.pop()
-
+          else{
+            NewObject(name,obj)
+          }
         // this method is used to create an Object of nestedclass
         case NestedClassObject(parent,name,obj)=>
           NestedObjectMapping += obj -> List(ObjectMapping(parent),name)
@@ -313,7 +317,10 @@ object SetClass:
 //    var expression = InterfaceDecl("setop",AbstractMethod("name"),AbstractMethod("name1")).evaluate
 //    println(expression)
 //    var expression = AbstractClassDef("setop",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),AbstractMethod("name")).evaluate
-//    expression = ClassDef("setop2",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name1",Assign(SetName("a"),Valset(1,2)))).evaluate
+    var expression = ClassDef("setop2",Field("a"),Constructor(Assign(SetName("a"),Valset(5,6))),Method("name",Union(SetName("x"),SetName("y")))).evaluate
+    expression = NewObject("setop2","z").evaluate
+    expression = InvokeMethod("z","name").evaluate
+    println(expression)
 //    expression = Extends("setop2","setop").evaluate
 //    println(ConstructorMapping("setop2"))
 //    println(MethodMapping("setop2"))

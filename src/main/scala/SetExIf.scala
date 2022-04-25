@@ -15,13 +15,15 @@ object SetExIf:
   private val trycatchflag : mutable.Stack[Any] = mutable.Stack(0)
   private val nestedflag : mutable.Map[String,Int] = mutable.Map()
 
+  type A = ExIf|Any
+
   // enum class used to implement Exception handling and If else
   enum ExIf:
     case Conversion(op:Any)
     case LoopEvaluate(op:Any*)
     case Then(op:Any*)
     case Else(op:Any*)
-    case IF(condition:SetDSL.SetOp1,Then:ExIf,Else:ExIf)
+    case IF[A](condition:A,Then:A,Else:A)
     case ExceptionClass(classdef:SetClass.SetClassImp)
     case Try(op:Any*)
     case Catch(op:Any*)
@@ -54,7 +56,7 @@ object SetExIf:
         case LoopEvaluate(op*)=>
           val z: mutable.ArrayBuffer[Any] = mutable.ArrayBuffer[Any]()
           for(i<- op){
-            if(flag.top==1){
+            if(flag.head==1){
               i
             }
             else{
@@ -69,7 +71,7 @@ object SetExIf:
         // Then class can take variable number of arguments which can be of SetClass.SetClassImp.*
         // and SetDSL.SetOp1.* and SetExIf.ExIf.*
         case Then(op*)=>
-          if(ifelseflag.top ==1){
+          if(ifelseflag.head ==1){
             LoopEvaluate(op*).eval.asInstanceOf[ArrayBuffer[Any]].last
           }
           else{
@@ -79,7 +81,7 @@ object SetExIf:
         // Else class can take variable number of arguments which can be of SetClass.SetClassImp.*
         // and SetDSL.SetOp1.* and SetExIf.ExIf.*
         case Else(op*) =>
-          if(ifelseflag.top==1){
+          if(ifelseflag.head==1){
             if(LoopEvaluate(op*).eval.asInstanceOf[ArrayBuffer[Any]].length >0){
               LoopEvaluate(op*).eval.asInstanceOf[ArrayBuffer[Any]].last
             }
@@ -95,21 +97,28 @@ object SetExIf:
         // and the other is Else case class
         case IF(condition,statements,els) =>
           ifelseflag.push(1)
-          val boolExp: Boolean = condition.eval.asInstanceOf[Boolean]
-          var variable: Any = ""
-          if(boolExp){
-            variable = statements.eval
+          val variable: mutable.Stack[Any] = mutable.Stack()
+          if(condition.asInstanceOf[SetDSL.SetOp1].eval.getClass.getSimpleName == "Check"){
+            variable.push(IF(Conversion(condition).eval,Then(statements).eval,Else(els).eval))
+            ifelseflag.pop()
+            variable.pop()
           }
           else{
-            variable = els.eval
+            val boolExp: Boolean = condition.asInstanceOf[SetDSL.SetOp1].eval.asInstanceOf[Boolean]
+            if(boolExp){
+              variable.push(statements.asInstanceOf[SetExIf.ExIf].eval)
+            }
+            else{
+              variable.push(els.asInstanceOf[SetExIf.ExIf].eval)
+            }
+            ifelseflag.pop()
+            variable.pop()
           }
-          ifelseflag.pop()
-          variable
         // this case class is used to evaluate the try condition in CatchException
         // Try class can take variable number of arguments which can be of SetClass.SetClassImp.*
         // and SetDSL.SetOp1.* and SetExIf.ExIf.*
         case Try(op*) =>
-          if (trycatchflag.top ==1){
+          if (trycatchflag.head ==1){
             val variable = LoopEvaluate(op*).eval.asInstanceOf[ArrayBuffer[Any]].last
             variable
           }
@@ -119,7 +128,7 @@ object SetExIf:
         // this case class is used to evaluate the Catch condition in CatchException
         // Catch class can take variable number of arguments but the last argument should be getMsg()
         case Catch(op*) =>
-          if(trycatchflag.top ==1){
+          if(trycatchflag.head ==1){
             LoopEvaluate(op*).eval.asInstanceOf[ArrayBuffer[Any]].last
           }
           else{
@@ -130,6 +139,9 @@ object SetExIf:
         // the constructor contains the error message
         case Throw(op) =>
           flag.push(1)
+          if(op.evaluate.getClass.getSimpleName == "NewObject"){
+            return Throw(op)
+          }
           val z: mutable.ArrayBuffer[Any] = mutable.ArrayBuffer[Any]()
           for(i<-op.evaluate.asInstanceOf[Set[Any]]){
             z.append(i)
@@ -139,6 +151,8 @@ object SetExIf:
         // getMsg() which is called in Catch Block which contains the message to be
         // returned if there is a exception
         case getMsg()=>
+          if(Msg.isEmpty)
+            return getMsg()
           Msg.last
         // this case class evaluates the CatchException which takes two operands one is try block
         // the other operand is catch block
@@ -152,7 +166,7 @@ object SetExIf:
           }
           val a:mutable.Stack[Any] = mutable.Stack()
           a.push(op.eval)
-          if(flag.top==1){
+          if(flag.head==1){
             flag.pop()
             a.push(op1.eval)
             if(nestedflag(name) >0){
@@ -168,16 +182,18 @@ object SetExIf:
 
   @main def runIt:Unit =
     import ExIf.*
-    var expression = ExceptionClass(ClassDef("exception",Field("a"),Constructor(Assign(SetName("a"),Valset("exception"))))).eval
-    expression = Assign(SetName("a"),Valset(1,2)).eval
-    expression = CatchException("exception",Try(
-      CatchException("exception",Try(
-        Throw(NewObject("exception","z"))),
-        Catch(getMsg())),Insert(SetName("a"),Valset(3,4))),
-      Catch(getMsg())).eval
-    println(expression)
-    expression = getSet("a").eval
+//    var expression = ExceptionClass(ClassDef("exception",Field("a"),Constructor(Assign(SetName("a"),Valset("exception"))))).eval
+//    expression = Assign(SetName("a"),Valset(1,2)).eval
+//    expression = CatchException("exception",Try(
+//      CatchException("exception",Try(
+//        Throw(NewObject("exception","z"))),
+//        Catch(getMsg())),Insert(SetName("a"),Valset(3,4))),
+//      Catch(getMsg())).eval
+//    println(expression)
+//    expression = getSet("a").eval
 //    var expression = Catch(getMsg()).eval
+//    var expression = Assign(SetName("z"),Valset(3,4)).eval
+    var expression = IF(Check(SetName("z"),Variable("var")),Then(Insert(SetName("z"),Create(Value(2),Value(1)))),Else(Assign(SetName("z"),Valset(1,2)))).eval
     println(expression)
 //    var expression = Assign(SetName("b"),Valset(3,4)).eval
 //    expression = Then(Assign(SetName("x"),Valset(1,2))).eval
@@ -190,7 +206,7 @@ object SetExIf:
 //    expression = Check(SetName("b"),Value(3)).eval
 //    expression = Try(IF(Check(SetName("b"),Value(1)),Then(Insert(SetName("b"),Valset(3,4))),Else(Insert(SetName("b"),Valset(3,4))))).eval
 //    println(expression)
-//    expression = CatchException(
+//    var expression = CatchException( "someexception",
 //      Try(IF(Check(SetName("b"),Value(1)),
 //        Then(Throw(NewObject("exception","z")),
 //          Insert(SetName("b"),Value(4))),
