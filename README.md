@@ -21,3 +21,4 @@ We can clone the project using git clone for this git should be installed in the
 ## [ClassOperations instructions](ClassOperation.md)
 ## [AbstractClassinterface instructions](AbstractInterfaceImplementation.md)
 ## [ExceptionIfElse instructions](ExceptionHandlingIfElse.md)
+## [Partial Implementation and Optimization Instructions](PartialOp.md)
